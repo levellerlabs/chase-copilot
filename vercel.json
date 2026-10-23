@@ -1,7 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "outputDirectory": "web",
   "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }],
   "functions": {
-    "api/index.mjs": { "includeFiles": ["web/**"] }
+    "api/index.mjs": { "includeFiles": "web/**" }
   }
 }
