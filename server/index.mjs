@@ -19,7 +19,19 @@ import { draftChase } from "../dist/drafts.js";
 import { clientProfiles, forecast } from "../dist/forecast.js";
 import { DEFAULT_ESCALATION } from "../dist/types.js";
 
-const WEB_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "web");
+function resolveWebDir() {
+  const candidates = [
+    join(dirname(fileURLToPath(import.meta.url)), "..", "web"),
+    join(process.cwd(), "web"),
+    join(process.cwd(), "..", "web"),
+  ];
+  for (const dir of candidates) {
+    if (existsSync(join(dir, "index.html"))) return dir;
+  }
+  return candidates[0];
+}
+
+const WEB_DIR = resolveWebDir();
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -181,6 +193,15 @@ export function createApp({ env = process.env, now = new Date(), port } = {}) {
   }
 
   const server = http.createServer((req, res) => {
+    handle(req, res);
+  });
+
+  /**
+   * Routes one request without owning a listening socket. The Node server
+   * delegates here; the Vercel serverless adapter calls it directly with the
+   * platform's Node req/res pair.
+   */
+  function handle(req, res) {
     const url = new URL(req.url || "/", "http://localhost");
     const run = url.pathname.startsWith("/api/")
       ? handleApi(req, res, url)
@@ -200,9 +221,9 @@ export function createApp({ env = process.env, now = new Date(), port } = {}) {
         res.end();
       }
     });
-  });
+  }
 
-  return { server, mode: paypal.mode, keyConfigured, config: DEFAULT_ESCALATION };
+  return { server, handle, mode: paypal.mode, keyConfigured, config: DEFAULT_ESCALATION };
 }
 
 export function start(opts) {
