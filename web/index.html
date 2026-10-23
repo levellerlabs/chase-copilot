@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chase - AI collections copilot</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@33.1.1/styles/ag-grid.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@33.1.1/styles/ag-theme-quartz.min.css" />
+<style>
+  :root {
+    --ink: #1c2430;
+    --muted: #5b6675;
+    --line: #e3e8ee;
+    --bg: #f6f8fa;
+    --card: #ffffff;
+    --accent: #0b6bcb;
+    --accent-ink: #ffffff;
+    --warn: #b35c00;
+    --danger: #b3261e;
+    --ok: #1a7f37;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  header {
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 22px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 20px; margin: 0; letter-spacing: 0.2px; }
+  header .sub { color: var(--muted); font-size: 13px; }
+  #mode-banner {
+    font-size: 12.5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  #mode-banner.sample { background: #fff3d6; color: var(--warn); border: 1px solid #ecd9ad; }
+  #mode-banner.live { background: #e2f3e7; color: var(--ok); border: 1px solid #bfe4cb; }
+  main {
+    max-width: 1280px;
+    margin: 18px auto 40px;
+    padding: 0 22px;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 18px;
+    align-items: start;
+  }
+  .cards {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 16px;
+  }
+  .card .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; }
+  .card .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .card .note { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .panel h2 {
+    font-size: 14px;
+    margin: 0;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: #fbfcfe;
+  }
+  .panel .body { padding: 12px 16px 16px; }
+  #invoice-grid { width: 100%; height: 430px; }
+  table.mini { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.mini th, table.mini td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  table.mini th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  table.mini td.num, table.mini th.num { text-align: right; }
+  #approval-tray .field { margin: 10px 0; }
+  #approval-tray label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  #approval-tray input, #approval-tray textarea {
+    width: 100%;
+    font: inherit;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+  }
+  #approval-tray textarea { min-height: 170px; resize: vertical; line-height: 1.45; }
+  .stage-chip {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: #e8f0fb;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  button.primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: 0;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.primary:disabled { opacity: 0.45; cursor: not-allowed; }
+  button.ghost {
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font: inherit;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .hint { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  #toast {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    max-width: 80vw;
+  }
+  #toast.show { opacity: 1; }
+  #toast.error { background: var(--danger); }
+  .empty { color: var(--muted); font-size: 13px; padding: 8px 0; }
+  @media (max-width: 980px) { main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Chase</h1>
+  <span class="sub">AI collections copilot for freelancers - PayPal + agentic drafting, human-approved sending</span>
+  <span id="mode-banner" class="sample">Sample data - not connected to PayPal</span>
+</header>
+
+<main>
+  <section class="cards">
+    <div class="card"><div class="label">Outstanding</div><div class="value" id="kpi-outstanding">-</div><div class="note" id="kpi-outstanding-note"></div></div>
+    <div class="card"><div class="label">Overdue invoices</div><div class="value" id="kpi-overdue">-</div><div class="note" id="kpi-overdue-note"></div></div>
+    <div class="card"><div class="label">Chases waiting approval</div><div class="value" id="kpi-due">-</div><div class="note">agent drafted, human sends</div></div>
+    <div class="card"><div class="label">Forecast next 2 weeks</div><div class="value" id="kpi-forecast">-</div><div class="note">from client payment behaviour</div></div>
+  </section>
+
+  <section class="panel">
+    <h2>Invoice aging - chase ladder</h2>
+    <div class="body">
+      <div id="invoice-grid" class="ag-theme-quartz"></div>
+      <p class="hint">Ladder: polite reminder, then firm follow-up, then final notice - minimum 4 days between chases,
+      stage steps at 7 and 14 days overdue, human handover past 45 days. Nothing sends without a named approver.</p>
+    </div>
+  </section>
+
+  <aside class="panel" id="approval-tray">
+    <h2>Approval tray</h2>
+    <div class="body">
+      <div id="tray-empty" class="empty">Pick "Draft chase" on an invoice. The agent writes the message, you approve or edit it. No message leaves without your name on the approval.</div>
+      <div id="tray-form" style="display:none">
+        <div><span class="stage-chip" id="tray-stage"></span> <strong id="tray-invoice"></strong></div>
+        <div class="field">
+          <label for="tray-subject">Subject</label>
+          <input id="tray-subject" type="text" />
+        </div>
+        <div class="field">
+          <label for="tray-body">Message (editable)</label>
+          <textarea id="tray-body"></textarea>
+        </div>
+        <div class="field">
+          <label for="tray-approver">Approved by (your name - required)</label>
+          <input id="tray-approver" type="text" placeholder="e.g. Joe" />
+        </div>
+        <div style="display:flex; gap:8px; margin-top:12px;">
+          <button class="primary" id="btn-send">Approve and send</button>
+          <button class="ghost" id="btn-cancel">Discard</button>
+        </div>
+        <p class="hint" id="tray-target"></p>
+      </div>
+    </div>
+  </aside>
+
+  <section class="panel">
+    <h2>Cashflow forecast - next 4 weeks</h2>
+    <div class="body">
+      <table class="mini" id="forecast-table">
+        <thead><tr><th>Week starting</th><th class="num">Expected in</th><th>Invoices</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Chase history</h2>
+    <div class="body">
+      <table class="mini" id="chase-table">
+        <thead><tr><th>Invoice</th><th>Stage</th><th>Sent</th><th>Approved by</th><th>Message</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<div id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/ag-grid-community@33.1.1/dist/ag-grid-community.min.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
