@@ -35,7 +35,7 @@ const FIXTURE_INVOICE = {
       billing_info: {
         name: { full_name: "Dana Tester" },
         business_name: "Dana Design Ltd",
-        email_address: "dana@example.com",
+        email_address: "sample-recipient-dana",
       },
     },
   ],
@@ -103,7 +103,7 @@ describe("LivePayPal", () => {
     expect(invoices[0]).toMatchObject({
       id: "INV2-TEST-0001",
       client_name: "Dana Tester",
-      client_email: "dana@example.com",
+      client_email: "sample-recipient-dana",
       amount_due: "1200.00",
       currency_code: "GBP",
       due_date: "2026-10-05",

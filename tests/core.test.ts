@@ -10,7 +10,7 @@ const TODAY = new Date("2026-10-23T00:00:00Z");
 const inv = (over: Partial<Invoice>): Invoice => ({
   id: "INV-T",
   client_name: "Test Client",
-  client_email: "t@example.com",
+  client_email: "sample-recipient-t",
   amount_due: "100.00",
   currency_code: "GBP",
   due_date: "2026-10-01",
