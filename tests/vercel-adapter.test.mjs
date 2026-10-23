@@ -5,6 +5,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { createApp } from "../server/index.mjs";
+import { createApp as createAppBundled } from "../api/bundle.mjs";
 
 const app = createApp({ env: {}, now: new Date("2026-10-23T12:00:00Z") });
 
@@ -72,5 +73,16 @@ describe("serverless adapter", () => {
     await new Promise((r) => setImmediate(r));
     expect(res.state.status).toBe(404);
     expect(JSON.parse(res.state.body).error).toBe("not found");
+  });
+
+  it("bundled artifact (deployed lambda path) serves health too", async () => {
+    const bundled = createAppBundled({ env: {}, now: new Date("2026-10-23T12:00:00Z") });
+    const res = makeRes();
+    bundled.handle(makeReq("GET", "/api/health"), res);
+    await new Promise((r) => setImmediate(r));
+    expect(res.state.status).toBe(200);
+    const data = JSON.parse(res.state.body);
+    expect(data.ok).toBe(true);
+    expect(data.mode).toBe("sample");
   });
 });

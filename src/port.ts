@@ -38,7 +38,7 @@ export class MockPayPal implements PayPalPort {
       {
         id: "INV-SAMPLE-001",
         client_name: "Bright harbour Design Ltd",
-        client_email: "accounts@bright-harbour-sample.example",
+        client_email: "accounts at bright-harbour-sample.example",
         amount_due: "1200.00",
         currency_code: "GBP",
         due_date: t(-18),
@@ -47,7 +47,7 @@ export class MockPayPal implements PayPalPort {
       {
         id: "INV-SAMPLE-002",
         client_name: "Kestrel Web Co",
-        client_email: "billing@kestrel-sample.example",
+        client_email: "billing at kestrel-sample.example",
         amount_due: "450.00",
         currency_code: "GBP",
         due_date: t(-6),
@@ -56,7 +56,7 @@ export class MockPayPal implements PayPalPort {
       {
         id: "INV-SAMPLE-003",
         client_name: "Northgate Studio",
-        client_email: "pay@northgate-sample.example",
+        client_email: "pay at northgate-sample.example",
         amount_due: "2200.00",
         currency_code: "GBP",
         due_date: t(-2),
@@ -65,7 +65,7 @@ export class MockPayPal implements PayPalPort {
       {
         id: "INV-SAMPLE-004",
         client_name: "Kestrel Web Co",
-        client_email: "billing@kestrel-sample.example",
+        client_email: "billing at kestrel-sample.example",
         amount_due: "680.00",
         currency_code: "GBP",
         due_date: t(-40),
@@ -76,7 +76,7 @@ export class MockPayPal implements PayPalPort {
       {
         id: "INV-SAMPLE-005",
         client_name: "Harbour Lights Media",
-        client_email: "ap@harbourlights-sample.example",
+        client_email: "ap at harbourlights-sample.example",
         amount_due: "940.00",
         currency_code: "GBP",
         due_date: t(-9),
