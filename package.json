@@ -6,12 +6,13 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "test": "npm run build && vitest run",
+    "test": "npm run build && npm run build:vercel && vitest run",
     "typecheck": "tsc --noEmit",
     "start": "node server/index.mjs",
     "build:vercel": "esbuild server/index.mjs --bundle --platform=node --format=esm --outfile=api/bundle.mjs"
   },
   "devDependencies": {
+    "esbuild": "0.21.5",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
   }
